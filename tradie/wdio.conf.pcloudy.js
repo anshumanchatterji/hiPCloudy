@@ -1,3 +1,4 @@
+
 const merge = require('deepmerge');
 const baseConf = require('../shared/wdio.android.conf.js');
 const tradieConf = require('./wdio.tradie.conf.js');
