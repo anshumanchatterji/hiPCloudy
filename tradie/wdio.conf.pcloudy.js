@@ -4,8 +4,8 @@ const tradieConf = require('./wdio.tradie.conf.js');
 const baseTradie = merge(baseConf, tradieConf);
 
 exports.config = merge(baseTradie.config, {
-  username: 'jaspreetbamrah@hipagesgroup.com.au',
-  password: 'dvmsq8v7qtnb9knrtvfk6k84',
+  pCloudyUserName: 'shibu.prasad@sstsinc.com',
+  pCloudyApiKey: '5vgzqqp4zrd2hdrgymbqz8yq',
   specs: ['./specs/*.js'],
   suites: {
     smoke: ['./specs/login/successful_login_spec.js'],
@@ -23,7 +23,7 @@ exports.config = merge(baseTradie.config, {
   logLevel: 'verbose',
   logOutput: './log/',
   protocol: 'https',
-  host: '###################WillBePopulatedLater#############',
+  host: 'device.pcloudy.com',
   port: 443,
   coloredLogs: true,
   bail: 0,
@@ -32,10 +32,40 @@ exports.config = merge(baseTradie.config, {
   oSversion: '6.0.1',
   count: 1,
   platform: '1',
-  os: '',
+  os: 'android',
   framework: 'jasmine',
   onPrepare(config, capabilities) {
-    console.log("on prepare ...");
+    	console.log("on prepare ...");
+	var AppiumpCloudy = require('./pCloudySample/sampleTest.js');
+	   
+	instance = new AppiumpCloudy();
+
+	var pCloudyConfigs = {
+	  "protocol" : config.protocol,
+	  "host" : config.host,
+	  "port" : config.port,
+	  "username" : config.pCloudyUserName,
+	  "password" : config.pCloudyApiKey,
+	  "appname" : config.appname,
+	  "oSversion": config.oSversion,
+	  "count":config.count,
+	  "platform":config.platform,
+	  "os" :config.os
+	}
+
+	instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
+	   		console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
+			config.host = appiumInterfaceResp.endpoint.replace("https://","") + "/wd/hub";
+			capabilities.browserName = appiumInterfaceResp.capabilities.browserName;
+			capabilities.deviceName = appiumInterfaceResp.capabilities.deviceName;
+
+	  
+		},function(appiumInterfaceRespErr){
+		    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
+		});
+
+
+
   },
   before(capabilities, specs) {
     const custComs = require('../shared/lib/custom_commands.js');
