@@ -36,9 +36,9 @@ exports.config = merge(baseTradie.config, {
   os: 'android',
   framework: 'jasmine',
   onPrepare(config, capabilities) {
-    	console.log("on prepare ...");
+    	console.log("on prepare Start...");
 	var AppiumpCloudy = require('./pCloudySample/sampleTest.js');
-  var promise = new Promise(function (resolve, reject) {
+  	var promise = new Promise(function (resolve, reject) {
 	instance = new AppiumpCloudy();
 
 	var pCloudyConfigs = {
@@ -67,8 +67,9 @@ exports.config = merge(baseTradie.config, {
     		    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
               reject({'status':'onpreparedoneErr'});
     		});
-     })
-     return promise
+     	});
+	console.log("on prepare End...");
+	return promise;
   },
   before(capabilities, specs) {
     const custComs = require('../shared/lib/custom_commands.js');
