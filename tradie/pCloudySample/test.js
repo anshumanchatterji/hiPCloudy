@@ -28,8 +28,8 @@ var configs = {
 }
 
 instance.appiumInterface(configs).then(function(appiumInterfaceResp) {
-   console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
+   		console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
   
-},function(appiumInterfaceRespErr){
-    console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
-});
+	},function(appiumInterfaceRespErr){
+	    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
+	});
