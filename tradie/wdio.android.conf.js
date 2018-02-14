@@ -43,8 +43,6 @@ exports.config = merge(baseTradie.config, {
   onComplete() {
    
       console.log("on complete ...");
-    const AppiumpCloudy = require('./sampleTest');
-    instance = new AppiumpCloudy();
-    instance.releasePCloudy();
+   
   }
 });

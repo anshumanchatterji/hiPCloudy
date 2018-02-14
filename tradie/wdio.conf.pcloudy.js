@@ -23,7 +23,7 @@ exports.config = merge(baseTradie.config, {
   logLevel: 'verbose',
   logOutput: './log/',
   protocol: 'https',
-  host: 'device.pcloudy.com',
+  host: '###################WillBePopulatedLater#############',
   port: 443,
   coloredLogs: true,
   bail: 0,

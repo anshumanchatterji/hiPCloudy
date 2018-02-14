@@ -1,11 +1,11 @@
 exports.config = {
   maxInstances: 1,
-  services: ['appium'],
-  appium: {
-    args: {
-      address: '0.0.0.0'
-    }
-  },
+ //  services: ['appium'],
+ //  appium: {
+ //    args: {
+ //      address: '0.0.0.0'
+ //    }
+ // },
   host: 'localhost',
 
   port: 4723,
