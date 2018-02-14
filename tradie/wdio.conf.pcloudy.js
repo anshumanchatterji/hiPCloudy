@@ -2,6 +2,7 @@ const merge = require('deepmerge');
 const baseConf = require('../shared/wdio.android.conf.js');
 const tradieConf = require('./wdio.tradie.conf.js');
 const baseTradie = merge(baseConf, tradieConf);
+var Promise = require('promise');
 
 exports.config = merge(baseTradie.config, {
   pCloudyUserName: 'shibu.prasad@sstsinc.com',
@@ -37,7 +38,7 @@ exports.config = merge(baseTradie.config, {
   onPrepare(config, capabilities) {
     	console.log("on prepare ...");
 	var AppiumpCloudy = require('./pCloudySample/sampleTest.js');
-	   
+  var promise = new Promise(function (resolve, reject) {
 	instance = new AppiumpCloudy();
 
 	var pCloudyConfigs = {
@@ -53,19 +54,21 @@ exports.config = merge(baseTradie.config, {
 	  "os" :config.os
 	}
 
-	instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
-	   		console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
-			config.host = appiumInterfaceResp.endpoint.replace("https://","") + "/wd/hub";
-			capabilities.browserName = appiumInterfaceResp.capabilities.browserName;
-			capabilities.deviceName = appiumInterfaceResp.capabilities.deviceName;
-
-	  
-		},function(appiumInterfaceRespErr){
-		    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
-		});
-
-
-
+	     instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
+    	   	console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
+    			config.host = appiumInterfaceResp.endpoint.split("https://")[1]+"/wd/hub";
+    			capabilities.browserName = appiumInterfaceResp.capabilities.browserName;
+    			capabilities.deviceName = appiumInterfaceResp.capabilities.deviceName;
+          var hubUrl = endPoint.endpoint + '/wd/hub',
+            p = config.protocol + "://" + config.host;
+            config.path = hubUrl.split(p)[1];
+            resolve({'status':'onpreparedone'});
+    		},function(appiumInterfaceRespErr){
+    		    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
+              reject({'status':'onpreparedoneErr'});
+    		});
+     })
+     return promise
   },
   before(capabilities, specs) {
     const custComs = require('../shared/lib/custom_commands.js');
