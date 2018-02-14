@@ -35,7 +35,7 @@ exports.config = merge(baseTradie.config, {
   platform: '1',
   os: 'android',
   framework: 'jasmine',
-  onPrepare(config, capabilities) {
+  beforeSession(config, capabilities, specs) {
     	console.log("on prepare Start...");
 	var AppiumpCloudy = require('./pCloudySample/sampleTest.js');
   	var promise = new Promise(function (resolve, reject) {
@@ -59,19 +59,23 @@ instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
     try{
       var hubUrl = appiumInterfaceResp.endpoint + '/wd/hub',
       p = config.protocol + "://" + config.host;
+      
       config.path = hubUrl.split(p)[1];
-      console.log("path "+config.path);
-      config.host = appiumInterfaceResp.endpoint.split("https://")[1]+"/wd/hub";
-      console.log("host "+config.host);
+      //config.host = appiumInterfaceResp.endpoint.split("https://")[1]+"/wd/hub";
+     
       capabilities.browserName = appiumInterfaceResp.bookedDevices[0].capabilities.browserName;//bookedDevices may have n numbers, remember to loop
       capabilities.deviceName = appiumInterfaceResp.bookedDevices[0].capabilities.deviceName;
 
 
-      console.log("after receiving "+JSON.stringify(appiumInterfaceResp));
+      //console.log("New Config: "+JSON.stringify(config));
+      console.log("Endpoint: " + config.protocol + " - " + config.host + " - " + config.port + " - " + config.path);
+      console.log("New Capabilities: "+JSON.stringify(capabilities));
+      resolve({'status':'onpreparedone'});
     } catch(e){
-      console.log("errr : "+e);
+      	console.log("errr : "+e);
+	reject({'status':'onpreparedoneErr'});
     }
-    resolve({'status':'onpreparedone'});
+
 },function(appiumInterfaceRespErr){
     console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
     reject({'status':'onpreparedoneErr'});
