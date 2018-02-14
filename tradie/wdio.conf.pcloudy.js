@@ -54,19 +54,28 @@ exports.config = merge(baseTradie.config, {
 	  "os" :config.os
 	}
 
-	     instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
-    	   	console.log("appiumInitResp received  in wdio.android.conf "+JSON.stringify(appiumInterfaceResp));
-    			config.host = appiumInterfaceResp.endpoint.split("https://")[1]+"/wd/hub";
-    			capabilities.browserName = appiumInterfaceResp.capabilities.browserName;
-    			capabilities.deviceName = appiumInterfaceResp.capabilities.deviceName;
-          var hubUrl = endPoint.endpoint + '/wd/hub',
-            p = config.protocol + "://" + config.host;
-            config.path = hubUrl.split(p)[1];
-            resolve({'status':'onpreparedone'});
-    		},function(appiumInterfaceRespErr){
-    		    	console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
-              reject({'status':'onpreparedoneErr'});
-    		});
+instance.appiumInterface(pCloudyConfigs).then(function(appiumInterfaceResp) {
+    console.log("appiumInitResp received  in wdio.android.conf .. "+JSON.stringify(appiumInterfaceResp));
+    try{
+      var hubUrl = appiumInterfaceResp.endpoint + '/wd/hub',
+      p = config.protocol + "://" + config.host;
+      config.path = hubUrl.split(p)[1];
+      console.log("path "+config.path);
+      config.host = appiumInterfaceResp.endpoint.split("https://")[1]+"/wd/hub";
+      console.log("host "+config.host);
+      capabilities.browserName = appiumInterfaceResp.bookedDevices[0].capabilities.browserName;//bookedDevices may have n numbers, remember to loop
+      capabilities.deviceName = appiumInterfaceResp.bookedDevices[0].capabilities.deviceName;
+
+
+      console.log("after receiving "+JSON.stringify(appiumInterfaceResp));
+    } catch(e){
+      console.log("errr : "+e);
+    }
+    resolve({'status':'onpreparedone'});
+},function(appiumInterfaceRespErr){
+    console.log("appiumInterfaceRespErr received  "+JSON.stringify(appiumInterfaceRespErr));
+    reject({'status':'onpreparedoneErr'});
+});
      })
      return promise
   },
