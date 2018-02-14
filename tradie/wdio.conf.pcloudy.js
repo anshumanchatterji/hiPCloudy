@@ -36,9 +36,9 @@ exports.config = merge(baseTradie.config, {
   os: 'android',
   framework: 'jasmine',
   onPrepare(config, capabilities) {
-    	console.log("on prepare ...");
+    	console.log("on prepare Start...");
 	var AppiumpCloudy = require('./pCloudySample/sampleTest.js');
-  var promise = new Promise(function (resolve, reject) {
+  	var promise = new Promise(function (resolve, reject) {
 	instance = new AppiumpCloudy();
 
 	var pCloudyConfigs = {
