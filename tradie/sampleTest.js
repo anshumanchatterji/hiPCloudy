@@ -5,7 +5,7 @@ var pCloudyConfig = require('./wdio.conf.pcloudy.js');
 var utils = require('./helpers/utils.js'),
 utilServices = new utils(),
 readline = require('readline'),
-configPath = '/configs/config-android.json',
+configPath = '/home/shibu/Desktop/WDIO/hiPCloudy/tradie/configs/config-android.json',
 configs = {},
 token = '',
 model = '',
@@ -20,13 +20,16 @@ var webdriverio = require('webdriverio');
 console.log('test');
 module.exports = function appiumPcloudy() {
   return {
-    appiumInterface : function(configPath){
+    appiumInterface : function(configs){
       console.log('configs new ==== ');
       var pointer = this;
-      utilServices.fileRead(configPath).then(function(configs) {
+      var promise = new Promise(function(resolve,reject){
+      console.log("configPath "+configPath);	
+      //utilServices.fileRead(configPath).then(function(configs) {
           try {
-              configs = JSON.parse(configs.data);
+              //configs = JSON.parse(configs.data);
               //configs = pCloudyConfig.config;
+                 
               console.log('config json ==' + configs.host);
               var cloudName = configs.host,
               email = configs.username,
@@ -100,11 +103,15 @@ module.exports = function appiumPcloudy() {
                                                               //core
                                                               pointer.appiumCore(token,devicePlatform,uploadedFile,configs).then(function(appiumLaunchStatus){
                                                                   logger.info("Status of pcloudy Appium Service Launch == > "+appiumLaunchStatus.status);
+
+resolve(appiumLaunchStatus);
                                                               },function(appiumLaunchErr){
                                                                   logger.error("Service Launch error : "+appiumLaunchErr);
                                                                   var releaseStat = JSON.parse(appiumLaunchErr);
-                                                                  logger.error('Error Status of Appium session release : '+releaseStat.result.msg);
-                                                              })
+                                                                  logger.error('Error Status of Appium session release '+releaseStat.result.msg);
+                                                              
+reject(appiumLaunchErr);
+})
                                                               //core
                                                           }else{
                                                               logger.info('could not upload  file : ' + status.file );
@@ -123,9 +130,11 @@ module.exports = function appiumPcloudy() {
                                                   //core
                                                   pointer.appiumCore(token,devicePlatform,app,configs).then(function(appiumLaunchStatus){
                                                       logger.info("Status of pcloudy Appium Service Launch == > "+appiumLaunchStatus.status);
+resolve(appiumLaunchStatus);
                                                   },function(appiumLaunchErr){
                                                       logger.debug("appium core reject 2 : "+appiumLaunchErr);
                                                       logger.error("Service Launch error : "+JSON.stringify(appiumLaunchErr));
+reject(appiumLaunchErr);
                                                       pointer.terminate();
                                                   })
                                                   //core
@@ -141,10 +150,13 @@ module.exports = function appiumPcloudy() {
               logger.debug("Error in Authenticating "+JSON.stringify(err));
               pointer.terminate();
           })
-      }, function(errRead) {
+      /*}, function(errRead) {
           logger.warn('error reading config ' + errRead);
           pointer.terminate();
-      })
+      })*/
+     })
+
+return promise;
     },
     appiumCore : function(token, platform, uploadedApp, configs) {
           logger.debug(" token " + token +" p " + platform + " a " + uploadedApp);
@@ -207,7 +219,7 @@ module.exports = function appiumPcloudy() {
                                                         if(initHubresp.hasOwnProperty('error')){
                                                             console.log('if has own property');
                                                             logger.error("Error in initiating Appium hub "+initHubresp.error);
-                                                            reject(initHubresp.error);
+                                                            reject({'error':initHubresp.error});
                                                             //terminate();
                                                         } else {
                                                             pcloudyConnectorServices.getAppiumEndPoint(initHubresp.token).then(function(getAppiumEndPointstat) {
@@ -217,11 +229,12 @@ module.exports = function appiumPcloudy() {
                                                                 endPoint = endPoint.result;
                                                                 if(endPoint.hasOwnProperty('error')){
                                                                     logger.error("getAppiumEndPoint Error : "+endPoint.error);
-                                                                    reject(endPoint.error);
+                                                                    reject({"error":endPoint.error});
                                                                 } else {
                                                                     //logger.info(JSON.stringify(endPoint));
                                                                     logger.info("\n ===================== Started Appium and Received Endpoint ================== \n ");
                                                                     logger.info(" endpoint  ==> " + endPoint.endpoint);
+resolve({'status':'done','endpoint':endPoint.endpoint,'token':initHubresp.token,'bookedDevices':bookedDevices})
                                                                     var options = {};
                                                                     try{
                                                                     var totalBokkedDevs = bookedDevices.length;
@@ -284,10 +297,10 @@ module.exports = function appiumPcloudy() {
                                                                             console.log("hi jas");
                                                                             //const jhkasdfjhlhasdf = require("./wdio.android.conf.js").fork;
 
-                                                                            const spawn = require('child_process').spawn;
-const ls = spawn('./node_modules/.bin/wdio', ['wdio.android.conf.js', '--suite=sanity']);
+                                                                            //const spawn = require('child_process').spawn;
+//const ls = spawn('./node_modules/.bin/wdio', ['wdio.android.conf.js', '--suite=sanity']);
 
-ls.stdout.on('data', (data) => {
+/*ls.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
 });
 
@@ -297,13 +310,13 @@ ls.stderr.on('data', (data) => {
 
 ls.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
-});
+});*/
 
 
                                                                             logger.info(" Webdriver Initiated for  : " + i.model);
                                                                             if(bookedDevices[index + 1]){
-                                                                                var next = bookedDevices[index + 1].manufacturer+'--'+bookedDevices[index + 1].model;
-                                                                                logger.debug("Webdriver Init Next : " + ((bookedDevices.length - 1 === index) ? resolve({'status':'done'}) : next));
+                                             var next = bookedDevices[index + 1].manufacturer+'--'+bookedDevices[index + 1].model;
+//logger.debug("Webdriver Init Next : " + ((bookedDevices.length - 1 === index) ? resolve({'status':'done','endpoint':endPoint.endpoint,'token':initHubresp.token,'options':options}) : next));
                                                                             }
                                                                         })
                                                                     }catch(errrr){
@@ -312,17 +325,17 @@ ls.on('close', (code) => {
                                                                 }
                                                             }, function(getAppiumEndPointErr) {
                                                                 logger.Error(" getAppiumEndPointErr : "+JSON.stringify(getAppiumEndPointErr));
-                                                                reject(getAppiumEndPointErr);
+                                                                reject({'error':getAppiumEndPointErr});
                                                             })
                                                         }
                                                     }, function(initAppiumHubForAppErr) {
                                                         logger.error('initAppiumHubForAppErr ' + JSON.stringify(initAppiumHubForAppErr));
-                                                        reject(initAppiumHubForAppErr);
+                                                        reject({'error':initAppiumHubForAppErr});
                                                     })
                                   }//else
                           }, function(bookdevErr) {
                               logger.debug('bookdevErr ' + JSON.stringify(bookdevErr));
-                              reject(bookdevErr);
+                              reject({'error':bookdevErr});
                           })
                   } catch (exp) {
                       logger.info("Err in appium core : " + exp);
@@ -330,7 +343,7 @@ ls.on('close', (code) => {
               }//else
           }, function(getDevErr) {
               logger.debug('getDevices Err : ' + JSON.stringify(getDevErr));
-              reject(getDevErr);
+              reject({'error':getDevErr});
           })
       }catch(err){
           logger.error("Error : "+err);
@@ -371,6 +384,7 @@ ls.on('close', (code) => {
         })
       },
       terminate : function(){
+          logger.error("terminating : .... ");
           process.exit(0);
       }
 }
